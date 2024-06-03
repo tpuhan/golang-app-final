@@ -2,6 +2,7 @@
 A simple GoLang Connector that takes in information from a JSON and inputs it into a supplied BigQuery Table.\
 First, create a directory in your file system that houses these files in this repository.\
 Ensure you have Go by running `go version`. If not follow steps to ensure Go is installed correctly.\
+Additionally, Ensure you have `proto-gen-go` by running `protoc-gen-go --version`. If you don't, refer to the troubleshooting section for instructions on downloading.\
 Ensure you have the files in this repository downloaded in a directory of your choice. These files should have the necessary configurations to run the code. If there's an error refer to the troubleshooting part of the document.\
 To run, simply run the following commands in order:\
 `go clean -modcache`\
