@@ -1,16 +1,5 @@
 // https://github.com/alexflint/bigquery-storage-api-example/blob/main/bigquery-storage-api.go
 
-// Next Steps:
-// - Examples in the Go Client and managedwriter
-// - Don't have to unmarshal it
-// - GetWS (gets schema from destination), should happen internally
-// - Figure out how to use default stream (Tanishqa)
-// - Understand more ab asynch sends per row (some examples) (Tanishqa)
-//	- Don't want to send and wait
-// - Enable retry logic
-// - Halt if in cases of invalid data etc (pt2, capture in dead letter queue)
-// - JSON Handling without .go/.proto step
-
 package main
 
 import (
