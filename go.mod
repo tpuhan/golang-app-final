@@ -1,4 +1,4 @@
-module golang-app-1
+module golang-app1
 
 go 1.23
 
