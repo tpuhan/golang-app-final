@@ -13,7 +13,7 @@ To run, simply run the following commands in order:\
 Check `proto-gen-go` installation by using the following command:\
   `go install google.golang.org/protobuf/cmd/protoc-gen-go@latest`\
 Ensure the Binary Directory is in your Path by running `export PATH=$PATH:$(go env GOPATH)/bin` and then `source ~/.bashrc`. Verify proto-gen-go is installed by running `protoc-gen-go --version` in your terminal.\
-Finally, run `protoc --go_out=. row.proto` to refresh the file and rerun the program.\
+Finally, run `protoc --go_out=. row.proto` to refresh the file and rerun the program.
 
 Next Steps:
 - Examples in the Go Client and managedwriter
