@@ -3,19 +3,18 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"os"
 
 	"cloud.google.com/go/bigquery/storage/managedwriter"
-	"cloud.google.com/go/bigquery/storage/managedwriter/adapt"
-	"google.golang.org/protobuf/proto"
 )
 
 const (
 	project = "bigquerytestdefault"
 	dataset = "siddag_summer2024"
-	table   = "tanishqa_summer2024_table"
+	table   = "raahi_summer2024table2"
 )
 
 func main() {
@@ -32,8 +31,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to read JSON file: %v", err)
 	}
-
-	var rows []*Row
+	//Unmarshal JSON into JSON map
+	var rows []map[string]interface{}
 	if err := json.Unmarshal(byteValue, &rows); err != nil {
 		log.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
@@ -46,14 +45,16 @@ func main() {
 	defer client.Close()
 
 	// Get protobuf descriptor
-	var row Row
-	descriptor, err := adapt.NormalizeDescriptor((&row).ProtoReflect().Descriptor())
-	if err != nil {
-		log.Fatal("NormalizeDescriptor: ", err)
-	}
+	// var row Row
+	// descriptor, err := adapt.NormalizeDescriptor((&row).ProtoReflect().Descriptor())
+	// if err != nil {
+	// 	log.Fatal("NormalizeDescriptor: ", err)
+	// }
+
+	md, descriptor := getDescriptors(ctx, client, project, dataset, table)
 
 	// Hard Coded Table reference (will fix)
-	tableReference := "projects/bigquerytestdefault/datasets/siddag_summer2024/tables/tanishqa_summer2024_table"
+	tableReference := fmt.Sprintf("projects/%s/datasets/%s/tables/%s", project, dataset, table)
 
 	// Create stream using NewManagedStream
 	managedStream, err := client.NewManagedStream(ctx,
@@ -69,9 +70,9 @@ func main() {
 	// Serialize rows
 	var data [][]byte
 	for _, row := range rows {
-		buf, err := proto.Marshal(row)
+		buf, err := json_to_binary(md, row)
 		if err != nil {
-			log.Fatal("proto.Marshal: ", err)
+			log.Fatal("converting from json to binary failed: ", err)
 		}
 		data = append(data, buf)
 	}
@@ -91,7 +92,7 @@ func main() {
 		// GetResult blocks until we receive a response from the API.
 		recvOffset, err := v.GetResult(ctx)
 		if err != nil {
-			log.Fatal("append %d returned error: %w", k, err)
+			log.Fatalf("append %d returned error: %v", k, err)
 		}
 		log.Printf("Successfully appended data at offset %d.\n", recvOffset)
 	}

@@ -1,6 +1,6 @@
 [
-    {"word": "g", "time": 1717434224000000},
-    {"word": "h", "time": 1717434240000000},
-    {"word": "i", "time": 1717434284000000},
-    {"word": "j", "time": 1717434300000000}
+    {"word": "hi", "int": 0, "bool": true},
+    {"word": "red", "int": 1, "bool": false},
+    {"word": "apple", "int": 2, "bool": true},
+    {"word": "dog", "int": 3, "bool": false}
 ]

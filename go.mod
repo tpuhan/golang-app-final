@@ -1,4 +1,4 @@
-module golang-app2
+module golang-app1
 
 go 1.19
 
