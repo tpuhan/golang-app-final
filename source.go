@@ -44,13 +44,7 @@ func main() {
 	}
 	defer client.Close()
 
-	// Get protobuf descriptor
-	// var row Row
-	// descriptor, err := adapt.NormalizeDescriptor((&row).ProtoReflect().Descriptor())
-	// if err != nil {
-	// 	log.Fatal("NormalizeDescriptor: ", err)
-	// }
-
+	//use getDescriptors to get the message descriptor, and descriptor proto
 	md, descriptor := getDescriptors(ctx, client, project, dataset, table)
 
 	// Hard Coded Table reference (will fix)
@@ -60,6 +54,7 @@ func main() {
 	managedStream, err := client.NewManagedStream(ctx,
 		managedwriter.WithType(managedwriter.DefaultStream),
 		managedwriter.WithDestinationTable(tableReference),
+		//use the descriptor proto when creating the new managed stream
 		managedwriter.WithSchemaDescriptor(descriptor),
 	)
 	if err != nil {
@@ -70,6 +65,7 @@ func main() {
 	// Serialize rows
 	var data [][]byte
 	for _, row := range rows {
+		//transform each row of data into binary using the json_to_binary function and the message descriptor from the getDescriptors function
 		buf, err := json_to_binary(md, row)
 		if err != nil {
 			log.Fatal("converting from json to binary failed: ", err)
