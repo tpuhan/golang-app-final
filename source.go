@@ -56,6 +56,7 @@ func main() {
 		managedwriter.WithDestinationTable(tableReference),
 		//use the descriptor proto when creating the new managed stream
 		managedwriter.WithSchemaDescriptor(descriptor),
+		managedwriter.EnableWriteRetries(true),
 	)
 	if err != nil {
 		log.Fatal("NewManagedStream: ", err)
