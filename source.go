@@ -14,7 +14,7 @@ import (
 const (
 	project = "bigquerytestdefault"
 	dataset = "siddag_summer2024"
-	table   = "raahi_summer2024table2"
+	table   = "table5"
 )
 
 func main() {
@@ -52,7 +52,7 @@ func main() {
 
 	// Create stream using NewManagedStream
 	managedStream, err := client.NewManagedStream(ctx,
-		managedwriter.WithType(managedwriter.DefaultStream),
+		managedwriter.WithType(managedwriter.CommittedStream),
 		managedwriter.WithDestinationTable(tableReference),
 		//use the descriptor proto when creating the new managed stream
 		managedwriter.WithSchemaDescriptor(descriptor),
@@ -64,35 +64,28 @@ func main() {
 	defer managedStream.Close()
 
 	// Serialize rows
-	var data [][]byte
+	// Checking Results Async (will check at end)
+	var offset int64
 	for _, row := range rows {
 		//transform each row of data into binary using the json_to_binary function and the message descriptor from the getDescriptors function
 		buf, err := json_to_binary(md, row)
 		if err != nil {
 			log.Fatal("converting from json to binary failed: ", err)
 		}
+
+		var data [][]byte
 		data = append(data, buf)
-	}
 
-	// Checking Results Async (will check at end)
-	var results []*managedwriter.AppendResult
-
-	// Appending Rows
-	stream, err := managedStream.AppendRows(ctx, data)
-	if err != nil {
-		log.Fatal("AppendRows: ", err)
-	}
-	results = append(results, stream)
-
-	// Checks if all results were successful
-	for k, v := range results {
-		// GetResult blocks until we receive a response from the API.
-		recvOffset, err := v.GetResult(ctx)
+		stream, err := managedStream.AppendRows(ctx, data, managedwriter.WithOffset(offset))
 		if err != nil {
-			log.Fatalf("append %d returned error: %v", k, err)
+			log.Fatal("AppendRows: ", err)
+		}
+		recvOffset, err := stream.GetResult(ctx)
+		if err != nil {
+			log.Fatalf("append returned error: %v", err)
 		}
 		log.Printf("Successfully appended data at offset %d.\n", recvOffset)
+		offset++
 	}
-
 	log.Println("Done")
 }
